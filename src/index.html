@@ -143,6 +143,7 @@
       .part { display: none }
       .part.hung { display: unset; }
     </style>
+    <script src="./random-words.js"></script>
   </head>
   <body>
     <div class='man'>
@@ -207,10 +208,12 @@
             if (letter === ch) spaces[i].innerText = ch;
           });
         }
+        [...word].forEach((letter, i) => {
+          spaces[i].innerText = letter;
+        });
       }
 
-      const word = 'supercoolword';
-      let game = play(word);
+      let game = play(words());
       const choose = (ch) => () => game.next(ch);
       for (let ch = 'A'; ch <= 'Z'; ch = String.fromCharCode(ch.charCodeAt(0) + 1)) {
         const button = document.createElement('button');
