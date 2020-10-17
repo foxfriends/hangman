@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <title>Hangman</title>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        justify-content: space-around;
+        overflow: hidden;
+      }
+      
+      .buttons,
+      .word {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      .button,
+      .letter {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+      }
+
+      .button {
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        background-color: #ffffff;
+      }
+
+      .button:hover {
+        background-color: #fafafa;
+      }
+
+      .letter {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        font-size: 20px;
+      }
+
+      .man {
+        position: relative;
+        width: 200px;
+        height: 400px;
+      }
+
+      .head {
+        box-sizing: border-box;
+        height: 40px;
+        width: 40px;
+        border-radius: 100%;
+        border: 3px solid black;
+        position: absolute;
+        left: 50%;
+        top: 20px;
+        transform: translateX(-50%);
+      }
+
+      .body {
+        height: 100px;
+        width: 3px;
+        background-color: black;
+        position: absolute;
+        left: 50%;
+        top: 60px;
+        transform: translateX(-50%);
+      }
+
+      .left-leg,
+      .left-arm,
+      .right-leg,
+      .right-arm {
+        height: 40px;
+        width: 3px;
+        background-color: black;
+        position: absolute;
+        left: 50%;
+        transform-origin: top center;
+      }
+
+      .left-arm,
+      .right-arm {
+        top: 80px;
+      }
+
+      .left-leg,
+      .right-leg {
+        top: 160px;
+      }
+
+      .left-arm,
+      .left-leg {
+        transform: translateX(-50%) rotate(-45deg);
+      }
+
+      .right-arm,
+      .right-leg {
+        transform: translateX(-50%) rotate(45deg);
+      }
+
+      .floor {
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        height: 3px;
+        background-color: black;
+      }
+
+      .left {
+        position: absolute;
+        height: 100%;
+        width: 3px;
+        background-color: black;
+      }
+
+      .top {
+        position: absolute;
+        width: 50%;
+        height: 3px;
+        background-color: black;
+      }
+
+      .noose {
+        position: absolute;
+        width: 3px;
+        height: 20px;
+        background-color: black;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .part { display: none }
+      .part.hung { display: unset; }
+    </style>
+  </head>
+  <body>
+    <div class='man'>
+      <div class='floor'></div>
+      <div class='left'></div>
+      <div class='top'></div>
+      <div class='noose'></div>
+      <div class='part head'></div>
+      <div class='part body'></div>
+      <div class='part left-arm'></div>
+      <div class='part right-arm'></div>
+      <div class='part left-leg'></div>
+      <div class='part right-leg'></div>
+    </div>
+    <div class='word'></div>
+    <div class='buttons'></div>
+
+    <script>
+      const difference = (a, b) => new Set([...a].filter(x => !b.has(x)));
+      const intersect = (a, b) => new Set([...a].filter(x => b.has(x)));
+      const union = (a, b) => new Set([...a, ...b]);
+      const equal = (a, b) => [...a].every(x => b.has(x)) && [...b].every(x => a.has(x));
+
+      const $man = document.querySelector('.man');
+      const $buttons = document.querySelector('.buttons');
+      const $word = document.querySelector('.word');
+      const $parts = document.querySelectorAll('.part');
+
+      function * play(word) {
+        word = word.toUpperCase();
+        $word.innerHTML = '';
+        const spaces = [];
+        for (const letter of word) {
+          const space = document.createElement('div');
+          space.classList.add('letter');
+          spaces.push(space);
+          $word.appendChild(space);
+        }
+
+        const guesses = new Set;
+        const allowed = new Set([...word]);
+        for (;;) {
+          const piecesHung = difference(guesses, allowed).size;
+          [...$parts].forEach((part, i) => {
+            if (i < piecesHung) {
+              part.classList.add('hung');
+            } else {
+              part.classList.remove('hung');
+            }
+          });
+          if (equal(intersect(guesses, allowed), allowed)) {
+            alert('win');
+            break;
+          } else if (difference(guesses, allowed).size === 6) {
+            alert('lose');
+            break;
+          }
+          const ch = yield;
+          console.log(ch);
+          guesses.add(ch);
+          [...word].forEach((letter, i) => {
+            if (letter === ch) spaces[i].innerText = ch;
+          });
+        }
+      }
+
+      const word = 'supercoolword';
+      let game = play(word);
+      const choose = (ch) => () => game.next(ch);
+      for (let ch = 'A'; ch <= 'Z'; ch = String.fromCharCode(ch.charCodeAt(0) + 1)) {
+        const button = document.createElement('button');
+        button.innerText = ch;
+        button.addEventListener('click', choose(ch));
+        button.classList.add('button');
+        $buttons.appendChild(button);
+      }
+      game.next();
+    </script>
+  </body>
+</html>

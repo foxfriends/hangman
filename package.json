@@ -1,0 +1,22 @@
+{
+  "name": "hangman",
+  "version": "1.0.0",
+  "description": "Hangman!",
+  "main": "src/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foxfriends/hangman.git"
+  },
+  "author": "Cameron Eldridge",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/foxfriends/hangman/issues"
+  },
+  "homepage": "https://github.com/foxfriends/hangman#readme",
+  "dependencies": {
+    "random-words": "^1.1.1"
+  }
+}
